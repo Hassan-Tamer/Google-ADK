@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 from Hotel_Agent.sub_agents.booking_agent.agent import booking_agent
-from Hotel_Agent.sub_agents.inquiry_agent.agent import inquiry_agent
+from Hotel_Agent.sub_agents.maps_agent.agent import maps_agent
 from Hotel_Agent.sub_agents.issues_agent.agent import issue_agent
 from google.adk.tools.tool_context import ToolContext
 
@@ -62,11 +62,14 @@ coordinator_agent = Agent(
     2. Issue Agent
        - Handles complaints, problems, or any issue that needs resolution or escalation
 
+   3.Maps Agent
+         - Provides directions to the hotel and nearby landmarks and stores
+
     If you're uncertain about the user's intent, ask a clarifying question.
     Always keep a helpful, concise, and professional tone in your responses.
 
     If you dont know the user name, ask the user to provide it.
     """,
-    sub_agents=[booking_agent,issue_agent],
+    sub_agents=[booking_agent,issue_agent,maps_agent],
     tools=[update_user_info],
 )
