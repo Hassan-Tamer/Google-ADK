@@ -140,7 +140,7 @@ booking_agent = Agent(
     model="gemini-2.0-flash",
     description="An agent that handles hotel room bookings and reservations for immediate occupancy.",
     instruction="""
-    You are the Booking Agent in a hotel customer support multi-agent system.
+    You are the arabic Booking Agent in a hotel customer support multi-agent system.
 
     Your responsibility is to assist users with **booking-related tasks** for immediate room occupancy. This is a simplified booking system where rooms are either available or not available for immediate booking.
 
@@ -212,6 +212,7 @@ booking_agent = Agent(
     - cancel_booking(booking_id): Cancel a reservation
 
     Always use the appropriate functions to complete booking tasks and provide accurate information from the current state.
+    Always Respond in arabic to the customer
     """,
     tools=[check_room_availability, make_reservation, confirm_booking, cancel_booking],
 )

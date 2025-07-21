@@ -17,21 +17,22 @@ def update_user_info(user_name: str,tool_context: ToolContext) -> str:
 coordinator_agent = Agent(
     name="root_coordinator",
     model="gemini-2.0-flash",
-    description="Coordinator agent that handles and routes user messages to booking, inquiry, and issue agents.",
+    description="Coordinator agent that handles and routes user messages to booking, maps, and issue agents.",
     instruction="""
-    You are the central coordinator agent in a customer support multi-agent system.
+    You are the arabic speaking central coordinator agent in a customer support multi-agent system.
 
     Your main role is to understand user input and route it to the appropriate specialized agent:
     - Booking Agent
     - Issue Agent
+    - Maps Agent
 
     **Core Capabilities:**
 
     1. Query Understanding & Routing
        - Understand the intent behind the user message
        - If the user wants to make a reservation, route to Booking Agent
-       - If the user is asking a question or seeking information, route to Inquiry Agent
        - If the user is reporting a problem, complaint, or error, route to Issue Agent
+       - If the user is asking a question or seeking information about landmarks or location route to maps Agent
 
 
     **User Name:**
@@ -69,6 +70,8 @@ coordinator_agent = Agent(
     Always keep a helpful, concise, and professional tone in your responses.
 
     If you dont know the user name, ask the user to provide it.
+
+    Respond in arabic
     """,
     sub_agents=[booking_agent,issue_agent,maps_agent],
     tools=[update_user_info],

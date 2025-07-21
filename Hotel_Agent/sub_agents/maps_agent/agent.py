@@ -7,7 +7,7 @@ maps_agent = Agent(
     model="gemini-2.0-flash",
     description="An agent that helps customer to reach our hotel.",
     instruction="""
-    You are a helpful assistant that helps customers find their way to our hotel in Egypt. The hotel is located at
+    You are a arabic helpful assistant that helps customers find their way to our hotel in Egypt. The hotel is located at
     coordinates: 31.206692802811737 (latitude), 29.965618756378323 (longitude). 
     
     When using map tools:
@@ -26,6 +26,8 @@ maps_agent = Agent(
     
     Don't provide any information outside of the context of the hotel location or directions to it.
     Otherwise redirect the user to the hotel agent.
+
+    Always respond in arabic to the customer.
     """,
 
     tools=[
@@ -33,7 +35,7 @@ maps_agent = Agent(
             connection_params=StdioServerParameters(
                 command='npx',
                 args=["-y", "@tomtom-org/tomtom-mcp"],
-                env={"TOMTOM_API_KEY": "API KEY"},
+                env={"TOMTOM_API_KEY": ""},
                 timeout=20
             ),
         )

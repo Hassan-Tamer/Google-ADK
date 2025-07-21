@@ -1,14 +1,17 @@
 import asyncio
 import uuid
-# from customer_service_agent.agent import customer_service_agent
 from Hotel_Agent.agent import coordinator_agent
 from dotenv import load_dotenv
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
+VERBOSE = False
+
 async def display_state(session_service, app_name, user_id, session_id):
     """Display the current state of the session."""
+    if not VERBOSE:
+        return
     session = await session_service.get_session(app_name=app_name, user_id=user_id, session_id=session_id)
     print("\nCurrent Session State:")
     for key, value in session.state.items():
@@ -17,18 +20,19 @@ async def display_state(session_service, app_name, user_id, session_id):
 
 async def process_agent_response(event):
     """Process and display agent response events."""
-    print(f"Event ID: {event.id}, Author: {event.author}")
+
+    if VERBOSE:
+        print(f"Event ID: {event.id}, Author: {event.author}")
 
     # Check for specific parts first
-    has_specific_part = False
-    if event.content and event.content.parts:
-        for part in event.content.parts:
-            if hasattr(part, "text") and part.text and not part.text.isspace():
-                print(f"  Text: '{part.text.strip()}'")
+    if VERBOSE:
+        if event.content and event.content.parts:
+            for part in event.content.parts:
+                if hasattr(part, "text") and part.text and not part.text.isspace():
+                    print(f"  Text: '{part.text.strip()}'")
 
-    # Check for final response after specific parts
     final_response = None
-    if not has_specific_part and event.is_final_response():
+    if event.is_final_response():
         if (
             event.content
             and event.content.parts
