@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
+from utils import STT,TTS
 
 VERBOSE = False
 
@@ -41,9 +42,9 @@ async def process_agent_response(event):
         ):
             final_response = event.content.parts[0].text.strip()
             
-            print("==" * 30)
-            print(f"Agent Response: {final_response}")
-            print("==" * 30)
+            # print("==" * 30)
+            # print(f"Agent Response: {final_response}")
+            # print("==" * 30)
 
         else:
             print("No final response text found in event content.")
@@ -87,6 +88,9 @@ initial_state = {
     "rooms_db": rooms_db,
 }
 
+stt = STT()
+tts = TTS()
+
 async def main_async():
     # Setup constants
     APP_NAME = "Hotel Customer Support"
@@ -110,13 +114,17 @@ async def main_async():
     print("Type 'exit' or 'quit' to end the conversation.\n")
 
     while True:
-        user_input = input("You: ")
+        # user_input = input("You: ")
+        user_input = stt.getSTT()
 
         if user_input.lower() in ["exit", "quit"]:
             print("Ending conversation. Goodbye!")
             break
 
-        await call_agent_async(runner, USER_ID, SESSION_ID, user_input)
+        response = await call_agent_async(runner, USER_ID, SESSION_ID, user_input)
+        print(f"Agent: {response}")
+        if response:
+            tts.getTTS(response)
 
     final_session = await session_service.get_session(
         app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID

@@ -1,3 +1,4 @@
+import os
 from google.adk.agents import Agent
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 
@@ -35,7 +36,7 @@ maps_agent = Agent(
             connection_params=StdioServerParameters(
                 command='npx',
                 args=["-y", "@tomtom-org/tomtom-mcp"],
-                env={"TOMTOM_API_KEY": ""},
+                env={"TOMTOM_API_KEY": os.getenv("TOMTOM_API_KEY", "")},
                 timeout=20
             ),
         )
