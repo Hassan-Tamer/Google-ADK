@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from utils import STT,TTS
-
+from utils import STT
+from TTS import *
 VERBOSE = False
 
 async def display_state(session_service, app_name, user_id, session_id):
@@ -89,7 +89,9 @@ initial_state = {
 }
 
 stt = STT()
-tts = TTS()
+gcp_tts = GCP_TTS()
+playai_tts = PlayAI_TTS()
+TTS_client = TTSClient(gcp_tts)
 
 async def main_async():
     # Setup constants
@@ -116,6 +118,7 @@ async def main_async():
     while True:
         # user_input = input("You: ")
         user_input = stt.getSTT()
+        # user_input = "اهلا، انا اسمي حسن"
 
         if user_input.lower() in ["exit", "quit"]:
             print("Ending conversation. Goodbye!")
@@ -124,7 +127,10 @@ async def main_async():
         response = await call_agent_async(runner, USER_ID, SESSION_ID, user_input)
         print(f"Agent: {response}")
         if response:
-            tts.getTTS(response)
+            TTS_client.speak(response)
+            TTS_client.set_strategy(playai_tts)
+            TTS_client.speak(response)
+            TTS_client.set_strategy(gcp_tts)
 
     final_session = await session_service.get_session(
         app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID
