@@ -1,11 +1,11 @@
 import asyncio
 import uuid
 from Hotel_Agent.agent import coordinator_agent
-from dotenv import load_dotenv
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
-from google.genai import types
-from utils import STT
+from dotenv import load_dotenv # type: ignore
+from google.adk.runners import Runner # type: ignore
+from google.adk.sessions import InMemorySessionService # type: ignore
+from google.genai import types # type: ignore
+from STT import *
 from TTS import *
 VERBOSE = False
 
@@ -88,10 +88,13 @@ initial_state = {
     "rooms_db": rooms_db,
 }
 
-stt = STT()
 gcp_tts = GCP_TTS()
 playai_tts = PlayAI_TTS()
 TTS_client = TTSClient(gcp_tts)
+
+gcp_stt = GCP_STT()
+groq_stt = GroqWhisper_STT()
+STT_client = STTClient(gcp_stt)
 
 async def main_async():
     # Setup constants
@@ -117,7 +120,7 @@ async def main_async():
 
     while True:
         # user_input = input("You: ")
-        user_input = stt.getSTT()
+        user_input = STT_client.listen_and_transcribe()
         # user_input = "اهلا، انا اسمي حسن"
 
         if user_input.lower() in ["exit", "quit"]:
