@@ -7,6 +7,8 @@ from typing import Optional
 import sounddevice as sd # type: ignore
 import scipy.io.wavfile as wav # type: ignore
 import numpy as np
+import json
+import string
 
 # GCP
 import subprocess
@@ -144,11 +146,68 @@ class STTClient:
         print(f"Transcribed Text[{self.strategy.name}]:", transcript)
         return transcript
 
+
+
+def remove_punctuation(text):
+    arabic_punctuation = "؟،؛ـ«»…“”"
+    all_punct = string.punctuation + arabic_punctuation
+    translator = str.maketrans('', '', all_punct)
+    return text.translate(translator)
+
+
+def evaluate(json_file_path, audio_dir, client):
+    from jiwer import wer
+    with open(json_file_path, 'r', encoding='utf-8') as f:
+        reference_data = json.load(f)
+
+    total_wer = 0
+    results = []
+
+    for item in reference_data:
+        filename = item["filename"]
+        ground_truth = item["transcribed_text"]
+        audio_path = os.path.join(audio_dir, filename)
+
+        try:
+            prediction = client.transcribe(audio_path)
+            prediction = remove_punctuation(prediction)
+            ground_truth = remove_punctuation(ground_truth)
+            error = wer(ground_truth, prediction)
+            results.append({
+                "filename": filename,
+                "ground_truth": ground_truth,
+                "prediction": prediction,
+                "wer": error
+            })
+
+            total_wer += error
+        except Exception as e:
+            results.append({
+                "filename": filename,
+                "error": str(e)
+            })
+
+    average_wer = total_wer / len([r for r in results if "wer" in r])
+
+    print(f"\n=== Evaluation Results ===")
+    for r in results:
+        if "wer" in r:
+            print(f"{r['filename']}: WER = {r['wer']:.2f}")
+        else:
+            print(f"{r['filename']}: ERROR = {r['error']}")
+
+    print(f"\nAverage WER: {average_wer:.2f}")
+
+    with open("results.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+    return results
+
+
 if __name__ == "__main__":
     gcp_stt = GCP_STT()
     groq_stt = GroqWhisper_STT()
     client = STTClient(groq_stt)
 
-    client.listen_and_transcribe()
-    client.set_strategy(gcp_stt)
-    client.listen_and_transcribe()
+    # evaluate("audio/GT.json", "audio/", groq_stt)
+    # evaluate("audio/GT.json", "audio/", gcp_stt)
