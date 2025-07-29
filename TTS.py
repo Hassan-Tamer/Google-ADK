@@ -3,7 +3,7 @@ import tempfile
 from abc import ABC, abstractmethod
 from pydub import AudioSegment # type: ignore
 from pydub.playback import play # type: ignore
-
+import mishkal.tashkeel
 # GCP imports
 from google.cloud import texttospeech
 
@@ -77,7 +77,12 @@ class TTSClient:
     def set_strategy(self, strategy: TTSStrategy):
         self.strategy = strategy
 
-    def speak(self, text: str):
+    def speak(self, text: str, use_tashkeel: bool = False):
+        if use_tashkeel:
+            print("Applying tashkeel to text...")
+            vocalizer = mishkal.tashkeel.TashkeelClass()
+            text = vocalizer.tashkeel(text)
+            print(f"Text with tashkeel: {text}")
         wav_file = self.strategy.synthesize(text)
         sound = AudioSegment.from_wav(wav_file)
         print("Playing response...")

@@ -120,8 +120,8 @@ async def main_async():
 
     while True:
         # user_input = input("You: ")
-        user_input = STT_client.listen_and_transcribe()
-        # user_input = "اهلا، انا اسمي حسن"
+        # user_input = STT_client.listen_and_transcribe()
+        user_input = "اهلا، انا اسمي حسن"
 
         if user_input.lower() in ["exit", "quit"]:
             print("Ending conversation. Goodbye!")
